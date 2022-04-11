@@ -92,7 +92,7 @@ double camY = 0;
 double MIN_CAM_S = ((float)W_H)/WORLD_SIZE;
 double camS = MIN_CAM_S;
 
-void resetWhenRpressed(){
+void resetWhenRPressed(){
    if (keyPressed) {
     if (key == 'r') {
          setup();
@@ -116,7 +116,7 @@ void draw(){
   drawParticles();
   drawExtras();
   drawUI();
-  resetWhenRpressed();
+  resetWhenRPressed();
 }
 void drawExtras(){
   if(arrowToDraw != null){
