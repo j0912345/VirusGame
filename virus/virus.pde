@@ -95,6 +95,8 @@ double camS = MIN_CAM_S;
 void resetWhenRPressed(){
    if (keyPressed) {
     if (key == 'r') {
+      // setup() resets the current UGO cell in MAKE UGO
+         Cell TempUGOCell = UGOcell;
          setup();
          print("clearing particles...\n");
          for (int i = 0; i < particles.size(); i++){
@@ -102,6 +104,7 @@ void resetWhenRPressed(){
          }
          print("particles cleared!\n");
          print(particles);
+         UGOcell = TempUGOCell;
     }
       delay(500);
     }
