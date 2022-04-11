@@ -91,6 +91,22 @@ double camX = 0;
 double camY = 0;
 double MIN_CAM_S = ((float)W_H)/WORLD_SIZE;
 double camS = MIN_CAM_S;
+
+void resetWhenRpressed(){
+   if (keyPressed) {
+    if (key == 'r') {
+         setup();
+         print("clearing particles...\n");
+         for (int i = 0; i < particles.size(); i++){
+           particles.remove(i);
+         }
+         print("particles cleared!\n");
+         print(particles);
+    }
+      delay(500);
+    }
+}
+
 void draw(){
   doParticleCountControl();
   iterate();
@@ -100,6 +116,7 @@ void draw(){
   drawParticles();
   drawExtras();
   drawUI();
+  resetWhenRpressed();
 }
 void drawExtras(){
   if(arrowToDraw != null){
