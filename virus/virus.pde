@@ -92,24 +92,6 @@ double camY = 0;
 double MIN_CAM_S = ((float)W_H)/WORLD_SIZE;
 double camS = MIN_CAM_S;
 
-void resetWhenRPressed(){
-   if (keyPressed) {
-    if (key == 'r') {
-      // setup() resets the current UGO cell in MAKE UGO
-         Cell TempUGOCell = UGOcell;
-         setup();
-         print("clearing particles...\n");
-         for (int i = 0; i < particles.size(); i++){
-           particles.remove(i);
-         }
-         print("particles cleared!\n");
-         print(particles);
-         UGOcell = TempUGOCell;
-    }
-      delay(500);
-    }
-}
-
 void draw(){
   doParticleCountControl();
   iterate();
@@ -119,7 +101,6 @@ void draw(){
   drawParticles();
   drawExtras();
   drawUI();
-  resetWhenRPressed();
 }
 void drawExtras(){
   if(arrowToDraw != null){
