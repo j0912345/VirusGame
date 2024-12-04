@@ -186,14 +186,14 @@ class Cell{
       }else if(info[1] == 3){
         die();
       }
-    }else if(info[0] == 3 && genome.directionOn == 0){
+    }else if(info[0] == 3 && genome.directionOn == 0){ // repair?
       if(info[1] == 1 || info[1] == 2){
         Particle particle = selectParticleInCell(info[1]-1);
         shootLaserAt(particle);
       }else if(info[1] == 3){
         healWall();
       }
-    }else if(info[0] == 4){
+    }else if(info[0] == 4){ // read?
       if(info[1] == 4){
         genome.performerOn = genome.getWeakestCodon();
       }else if(info[1] == 5){

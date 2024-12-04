@@ -44,7 +44,8 @@ class Particle{
       int currentType = getCellTypeAt(coor,true);
       int futureType = getCellTypeAt(future,true);
       if(type == 2 && currentType == 0 && futureType == 2 &&
-      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size() <= MAX_CODON_COUNT // there are few enough codons that we can fit in the new material!
+      /* added -1 because max size viruses don't seem to ever go into other cells if we didn't directly build them ourselves*/
+      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size()-1  <= MAX_CODON_COUNT // there are few enough codons that we can fit in the new material!
       && !getCellAt(future,true).tampered){ // I'm just gonna make it so that if a cell is already tampered, it can't accept any new injected material
         injectGeneticMaterial(future);  // UGO is going to inject material into a cell!
       }else if(futureType == 1 ||
