@@ -55,9 +55,11 @@ class Particle{
     if(cellTransfer(coor, future)){
       int currentType = getCellTypeAt(coor,true);
       int futureType = getCellTypeAt(future,true);
+      // completely remove check for if the cell is tampered already.
+      // now with random mutations, this helps viruses to be able to actually kill the final cells that ended up getting infected with some 1 codon "virus" or some virus with normal cell code.
+      // I also just prefer it like this. IMO, the max codon capacity should be the only thing restricting multiple viruses infecting the same cell.
       if(type == 2 && currentType == 0 && futureType == 2 &&
-      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size()  <= MAX_CODON_COUNT // there are few enough codons that we can fit in the new material!
-      && !getCellAt(future,true).tampered){ // I'm just gonna make it so that if a cell is already tampered, it can't accept any new injected material
+      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size()  <= MAX_CODON_COUNT){ // there are few enough codons that we can fit in the new material!
         injectGeneticMaterial(future);  // UGO is going to inject material into a cell!
       }else if(futureType == 1 ||
       (type >= 1 && (currentType != 0 || futureType != 0))){ // bounce

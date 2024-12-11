@@ -41,7 +41,6 @@ double WALL_DAMAGE = 0.01;
 double CODON_DEGRADE_SPEED = 0.008;
 double EPS = 0.00000001;
 
-// ^ = -1, 
 String starterGenome = "46-11-22-33-11-22-33-45-44-57__-67__";
 // original: String starterGenome = "46-11-22-33-11-22-33-45-44-57__-67__";
 boolean canDrag = false;
@@ -326,7 +325,7 @@ int loopCodonInfo(int val) {
 }
 // neat packing but also kinda a pain because you have to bring up an ascii table to convert these for hardcoded strings.
 // I might make a format that's easier to process for humans.
-// ALSO NOTE THAT WHILE IT LOOKS LIKE IT STARTS FROM A, IT EFFECTIVELY STARTS FROM ^ FOR HARDCODED STRINGS IN THE CODE!
+// ALSO NOTE THAT WHILE IT LOOKS LIKE IT STARTS FROM A, IT EFFECTIVELY STARTS FROM _ FOR HARDCODED STRINGS IN THE CODE!
 int codonCharToVal(char c) {
   int val = (int)(c) - (int)('A');
   return val-30;

@@ -366,12 +366,12 @@ class Cell{
     }
   }
   public void tamper(int team){
-    if(!tampered){
       tampered = true;
-      cellCounts[0]--;
-      cellCounts[1+team]++;
+      if(tampered_team == -1 || tampered_team != team){
+        cellCounts[1+tampered_team]--;
+        cellCounts[1+team]++;
+      }
       tampered_team = team;
-    }
   }
   public void die(){
     int freedVirusCount = particlesInCell.get(2).size();
