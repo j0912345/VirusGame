@@ -193,7 +193,7 @@ class Cell{
       }else if(info[1] == 3){
         healWall();
       }
-    }else if(info[0] == 4){ // read?
+    }else if(info[0] == 4){ // move hand
       if(info[1] == 4){
         genome.performerOn = genome.getWeakestCodon();
       }else if(info[1] == 5){
@@ -203,11 +203,11 @@ class Cell{
       }else if(info[1] == 7){
         genome.performerOn = loopItInt(genome.rotateOn+info[2],genome.codons.size());
       }
-    }else if(info[0] == 5 && genome.directionOn == 1){
+    }else if(info[0] == 5 && genome.directionOn == 1){ // read
       if(info[1] == 7){
         readToMemory(info[2],info[3]);
       }
-    }else if(info[0] == 6){
+    }else if(info[0] == 6){ // write
       if(info[1] == 7 || genome.directionOn == 0){
         writeFromMemory(info[2],info[3]);
       }
@@ -257,6 +257,12 @@ class Cell{
     cellCounts[7+tampered_team]++; // one more virus in the cells
     newUGO.addToCellList();
     laserTarget = newUGO;
+    
+    var randomValue = Math.random();
+    if(VIRUS_RAND_MUTATION_PERCENT_ON_REPRODUCE >=  randomValue)
+    {
+      newUGO.randomMutation();
+    }
     
     String[] memoryParts = memory.split("-");
     for(int i = 0; i < memoryParts.length; i++){

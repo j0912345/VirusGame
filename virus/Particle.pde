@@ -36,6 +36,18 @@ class Particle{
     }
     return result;
   }
+  
+  public void randomMutation(){ randomMutation(1); }
+  public void randomMutation(int mutationAmount)
+  {
+    for(int i = 0; i < mutationAmount; i++)
+    {
+      // this may or may not be broken with UGO_genome.codons.length-1?
+      // the rounding also may or may not be broken?
+      UGO_genome.codons.get((int)(Math.floor(Math.random() * (UGO_genome.codons.size()-1)))).setInfo( (int)(Math.random() * 3),  (int)(Math.random() * 7));
+    }
+  }
+  
   public void moveDim(int d){
     float visc = (getCellTypeAt(coor,true) == 0) ? 1 : 0.5;
     double[] future = copyCoor();
@@ -44,8 +56,7 @@ class Particle{
       int currentType = getCellTypeAt(coor,true);
       int futureType = getCellTypeAt(future,true);
       if(type == 2 && currentType == 0 && futureType == 2 &&
-      /* added -1 because max size viruses don't seem to ever go into other cells if we didn't directly build them ourselves*/
-      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size()-1  <= MAX_CODON_COUNT // there are few enough codons that we can fit in the new material!
+      UGO_genome.codons.size()+getCellAt(future,true).genome.codons.size()  <= MAX_CODON_COUNT // there are few enough codons that we can fit in the new material!
       && !getCellAt(future,true).tampered){ // I'm just gonna make it so that if a cell is already tampered, it can't accept any new injected material
         injectGeneticMaterial(future);  // UGO is going to inject material into a cell!
       }else if(futureType == 1 ||
