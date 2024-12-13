@@ -1,6 +1,5 @@
 - extra varible that controls how used energy scales with the amount of food particles in the enviorment and the world size
 - some kind of immune system particle
-- some kind of particle that will give energy to sells that have ran out of energy, giving them a second chance instead of just being a fully sealed fate of death
+- some kind of particle that will give energy to cells that have ran out of energy, giving them a second chance instead of just being a fully sealed fate of death
 - FIX BUG WITH GRAPH ON LARGE WORLD SIZES
 - some kind of cell reproduction system
-- mutations

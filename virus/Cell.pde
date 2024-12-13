@@ -173,9 +173,39 @@ class Cell{
           eat(foodToEat);
         }
       }else if(info[1] == 3){ // digest "wall"
-        energy += (1-energy)*E_RECIPROCAL*0.2;
+        energy += (1-energy)*E_RECIPROCAL*0.4;
         hurtWall(26);
         laserWall();
+      }else if(info[1] == 8){ // digest UGO, potentially some basic immune system simulation before I add whatever immune particles I've been thinking of
+      
+        /// TODO: MAKE DIGEST UGO CREATE WASTE PARTICLE
+        /// <strikethru>TODO: if this does end up removing all of them, make the energy cost scale.</strikethru> this'd kinda defeat the point of it's energy restore. maybe the main focus should just be on removing ugos though.
+        /// TODO: DOUBLE CHECK THAT A CELL CAN'T GAIN INFINITE ENERGY BY WRITING AND EATING UGOS IN A LOOP!
+        /// TODO: make a function for handling shooting the laser at multiple coords
+        /// TODO: make a nicer delete animation
+        
+        if(particlesInCell.get(2).size() > 0){
+          laserT = frame_count;
+          laserCoor.clear();
+          
+          energy += (1-energy)*E_RECIPROCAL*0.1;
+          var currVirus = particlesInCell.get(2).get(0);
+          cellCounts[7+currVirus.team]--;
+          laserCoor.add(currVirus.coor);
+          
+          particlesInCell.get(2).get(0).removeParticle();
+          
+          laserTarget = null;
+        }
+        
+        //while(particlesInCell.get(2).size() > 0){
+        //  energy += (1-energy)*E_RECIPROCAL*0.1;
+        //  var currVirus = particlesInCell.get(2).get(0);
+        //  laserCoor.add(currVirus.coor);
+        //  cellCounts[7+currVirus.team]--;
+        //  // yup, doesn't use currVirus.
+        //  particlesInCell.get(2).get(0).removeParticle();
+        //}
       }
     }else if(info[0] == 2 && genome.directionOn == 0){
       if(info[1] == 1 || info[1] == 2){
@@ -208,7 +238,8 @@ class Cell{
         readToMemory(info[2],info[3]);
       }
     }else if(info[0] == 6){ // write
-      if(info[1] == 7 || genome.directionOn == 0){
+      // writes that produce UGOs now specifically check for the new "UGO" codon operand instead of just doing that by default for any outwards write no matter the operand codon.
+      if((info[1] == 7) || (genome.directionOn == 0 && info[1] == 8)){
         writeFromMemory(info[2],info[3]);
       }
     }
@@ -308,10 +339,11 @@ class Cell{
       shootLaserAt(food);
     }
   }
-  void shootLaserAt(Particle food){
+  void shootLaserAt(Particle targetParticle){
     laserT = frame_count;
-    laserTarget = food;
+    laserTarget = targetParticle;
   }
+  
   public double[] getHandCoor(){
     double r = genome.HAND_DIST;
     if(genome.directionOn == 0){
@@ -366,12 +398,12 @@ class Cell{
     }
   }
   public void tamper(int team){
-      tampered = true;
-      if(tampered_team == -1 || tampered_team != team){
-        cellCounts[1+tampered_team]--;
-        cellCounts[1+team]++;
-      }
-      tampered_team = team;
+    tampered = true;
+    if(tampered_team == -1 || tampered_team != team){
+      cellCounts[1+tampered_team]--;
+      cellCounts[1+team]++;
+    }
+    tampered_team = team;
   }
   public void die(){
     int freedVirusCount = particlesInCell.get(2).size();
@@ -411,6 +443,7 @@ class Cell{
     particlesInCell.get(food.type).add(food);
   }
   public void removeParticleFromCell(Particle food){
+    // the food variable name is possibly misleading. this could also be other particle types(?)
     ArrayList<Particle> myList = particlesInCell.get(food.type);
     for(int i = 0; i < myList.size(); i++){
       if(myList.get(i) == food){

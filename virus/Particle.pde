@@ -42,8 +42,6 @@ class Particle{
   {
     for(int i = 0; i < mutationAmount; i++)
     {
-      // this may or may not be broken with UGO_genome.codons.length-1?
-      // the rounding also may or may not be broken?
       UGO_genome.codons.get((int)(Math.floor(Math.random() * (UGO_genome.codons.size()-1)))).setInfo( (int)(Math.random() * 3),  (int)(Math.random() * 7));
     }
   }
@@ -100,10 +98,18 @@ class Particle{
       int[] info = toInject.get(i).codonInfo;
       c.genome.codons.add(injectionLocation+i,new Codon(info,1.0,true));
     }
-    if(c.genome.performerOn >= c.genome.rotateOn){
+    if(c.genome.performerOn >= c.genome.rotateOn && !INSERT_UGO_CODONS_IN_FRONT_OF_INTERPRETER){
       c.genome.performerOn += INJECT_SIZE;
     }
-    c.genome.rotateOn += INJECT_SIZE;
+    else{
+      // might run a codon twice but will make sure the first virus's codon isn't skipped.
+      c.genome.rotateOn -= 1;
+      // occasionally, the above line will result in an index of -1 and cause an index out of bounds error.
+      // copied from cell.tickGene()
+      if(c.genome.rotateOn < 0){
+        c.genome.rotateOn = (c.genome.rotateOn+1)%c.genome.codons.size();
+      }
+    }
     if(c.tampered){ // cell is already tampered by someone
       cellCounts[7+c.tampered_team]--; // virus particle in the cell BEFORE this UFO injects, is decreased 
     }
@@ -164,11 +170,12 @@ class Particle{
     }
     popMatrix();
   }
-
+  
   public void removeParticle(){
     particles.get(type).remove(this);
     getCellAt(coor,true).particlesInCell.get(type).remove(this);
   }
+  
   public void addToCellList(){
     Cell cellIn = getCellAt(coor,true);
     cellIn.addParticleToCell(this);

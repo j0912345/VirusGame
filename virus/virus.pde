@@ -41,8 +41,9 @@ double WALL_DAMAGE = 0.01;
 double CODON_DEGRADE_SPEED = 0.008;
 double EPS = 0.00000001;
 
-String starterGenome = "46-11-22-33-11-22-33-45-44-57__-67__";
-// original: String starterGenome = "46-11-22-33-11-22-33-45-44-57__-67__";
+String starterGenome = "46-11-18-22-33-11-22-33-45-44-57__-67__";
+// original: String starterGenome = 46-11-22-33-11-22-33-45-44-57__-67__;
+// default in this mod: 46-11-18-22-33-11-22-33-45-44-57__-67__
 boolean canDrag = false;
 double clickWorldX = -1;
 double clickWorldY = -1;
@@ -66,6 +67,7 @@ int MAX_CODON_COUNT = 24; // If a cell were to have more codons in its DNA than 
 int team_produce = 0; // starts as Team 0, but as soon as the first UGO is created, it switches to Team 1.
 // int MAX_CODONS_FOR_VIRUS = 24; this isn't actually implemented yet and it's weirdly hard to find where exactly i have to change things to implement this?
 double VIRUS_RAND_MUTATION_PERCENT_ON_REPRODUCE = 0.1;
+boolean INSERT_UGO_CODONS_IN_FRONT_OF_INTERPRETER = true;
 
 double SPEED_LOW = 0.01;
 double SPEED_HIGH = 0.02;
@@ -100,9 +102,9 @@ void setup() {
   // the starter ugo values?
   // FOR RGLS HERE: REMEMBER THAT IF YOU'RE COPYING FROM A MEMORY STRING THAT __ WILL LOOK LIKE 1 LARGE CHARACTER!
   // see also the codonCharToVal() and codonValToChar() functions
-  // 7 codon triple write + kamikaze: 45-47^e__-57-46-60-60-60-23
+  // 7 codon triple write + kamikaze: 45-47__-57^e-46-68-68-68-23
   // 5 codon blank: 00-00-00-00-00
-  UGOcell = new Cell(-1, -1, 2, 0, 1, "45-47__-57^e-46-60-60-60-23");
+  UGOcell = new Cell(-1, -1, 2, 0, 1, "45-47__-57^e-46-68-68-68-23");
 }
 int getTypeFromXY(int preX, int preY) {
   int[] weirdo = {0, 1, 1, 2};
