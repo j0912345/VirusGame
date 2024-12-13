@@ -145,7 +145,7 @@ class Genome{
     return str;
   }
   String getGenomeStringLengthened(){
-    if(codons.size() == 9){
+    if(codons.size() == UGO_MAX_CODONS){
       return getGenomeString();
     }else{
       return getGenomeString()+"-00";

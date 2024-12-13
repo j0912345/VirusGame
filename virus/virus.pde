@@ -65,9 +65,11 @@ color DEAD_COLOR = color(80, 80, 80);
 color WALL_COLOR = color(170, 100, 170);
 int MAX_CODON_COUNT = 24; // If a cell were to have more codons in its DNA than this number if it were to absorb a cirus particle, it won't absorb it.
 int team_produce = 0; // starts as Team 0, but as soon as the first UGO is created, it switches to Team 1.
-// int MAX_CODONS_FOR_VIRUS = 24; this isn't actually implemented yet and it's weirdly hard to find where exactly i have to change things to implement this?
 double VIRUS_RAND_MUTATION_PERCENT_ON_REPRODUCE = 0.1;
 boolean INSERT_UGO_CODONS_IN_FRONT_OF_INTERPRETER = true;
+
+// this is handled in Genome.getGenomeStringLengthened()
+int UGO_MAX_CODONS = 12;
 
 double SPEED_LOW = 0.01;
 double SPEED_HIGH = 0.02;
