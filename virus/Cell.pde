@@ -361,11 +361,36 @@ class Cell{
     double[] result = {handX, handY};
     return result;
   }
+  
+  //public void getValidAdjacentParticlePushOutTiles(){
+  //  int[][] dire = {{0,1},{0,-1},{1,0},{-1,0}};
+  //  while(cells[y+dire[chosen][1]][x+dire[chosen][0]].type == 1){
+   
+  //  }
+  //}
+  
   public void pushOut(Particle waste){
     int[][] dire = {{0,1},{0,-1},{1,0},{-1,0}};
-    int chosen = -1;
-    while(chosen == -1 || cells[y+dire[chosen][1]][x+dire[chosen][0]].type != 0){
-      chosen = (int)random(0,4);
+    /// TODO: implement chosenValuesPreviouslyChecked
+    ArrayList<Integer> chosenValuesPreviouslyChecked = new ArrayList<Integer>();
+    //Arraylist<int> chosenValuesPreviouslyChecked = new Arraylist<int>(); // keep track so we know when to exit the loop but still make it randomly choose a direction.
+    int chosen = (int)random(0, 4);
+    chosenValuesPreviouslyChecked.add(chosen);
+    // System.out.println(cells[0] + " | " + cells[1] + " | x:" + x +  " | y: " + y + " | chosen: " + chosen + " | cells.size(): " + cells.length);
+    // breaks for cells too close to the edge
+    // this function as a whole is a pain because all of its annoying bugs that only crop up when trying to make new map layouts.
+    // =============================================================================================================================================
+    // we allow removing waste by just inserting it to another adjacent cell.
+    // that should allow waste to eventually get out if there's a large chain of adjacent cells covered by walls that eventually gets to empty space.
+    while(cells[y+dire[chosen][1]][x+dire[chosen][0]].type == 1){
+      System.out.println("looping..." + chosen);
+      chosenValuesPreviouslyChecked.add(chosen);
+      chosen = (int)random(0, 4);
+      //if(chosen >= 3)
+      // {
+      //  System.out.println("can't push out particle; there are no adjacent empty space/cell tiles. I am apparently surrounded by walls on all sides. cell position: " + " | x: " + x + " | y: " + y);
+      //  return;
+      // }
     }
     double[] oldCoor = waste.copyCoor();
     for(int dim = 0; dim < 2; dim++){

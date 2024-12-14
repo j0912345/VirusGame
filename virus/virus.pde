@@ -41,9 +41,10 @@ double WALL_DAMAGE = 0.01;
 double CODON_DEGRADE_SPEED = 0.008;
 double EPS = 0.00000001;
 
-String starterGenome = "46-11-18-22-33-11-22-33-45-44-57__-67__";
+String starterGenome = "46-11-22-33-11-22-33-45-44-57__-67__";
 // original: String starterGenome = 46-11-22-33-11-22-33-45-44-57__-67__;
-// default in this mod: 46-11-18-22-33-11-22-33-45-44-57__-67__
+// default with digest ugo: 46-11-18-22-33-11-22-33-45-44-57__-67__
+// default for the mod: 46-11-22-33-11-22-33-45-44-57__-67__
 boolean canDrag = false;
 double clickWorldX = -1;
 double clickWorldY = -1;
@@ -63,7 +64,7 @@ color HEALTHY_COLOR = color(225, 190, 225);
 color[] TAMPERED_COLOR = {color(205, 225, 70), color(160, 160, 255)};
 color DEAD_COLOR = color(80, 80, 80);
 color WALL_COLOR = color(170, 100, 170);
-int MAX_CODON_COUNT = 24; // If a cell were to have more codons in its DNA than this number if it were to absorb a cirus particle, it won't absorb it.
+int MAX_CODON_COUNT = 24; // If a cell were to have more codons in its DNA than this number if it were to absorb a virus particle, it won't absorb it.
 int team_produce = 0; // starts as Team 0, but as soon as the first UGO is created, it switches to Team 1.
 double VIRUS_RAND_MUTATION_PERCENT_ON_REPRODUCE = 0.1;
 boolean INSERT_UGO_CODONS_IN_FRONT_OF_INTERPRETER = true;
@@ -108,7 +109,27 @@ void setup() {
   // 5 codon blank: 00-00-00-00-00
   UGOcell = new Cell(-1, -1, 2, 0, 1, "45-47__-57^e-46-68-68-68-23");
 }
-int getTypeFromXY(int preX, int preY) {
+
+int getTypeFromXY(int preX, int preY){ return getTypeFromXY(preX, preY, 0);}
+
+int getTypeFromXY(int preX, int preY, int type) {
+  var result = 1;
+  switch(type){
+    case 0:
+      result = _default_getTypeFromXY(preX, preY);
+      break;
+    case 1:
+      result = _random_getTypeFromXY(preX, preY);
+      break;
+    case 2:
+      result = _Squares_getTypeFromXY(preX, preY);
+      break;
+  }
+  return result;
+}
+
+int _default_getTypeFromXY(int preX, int preY){
+  /// uhhh, what???
   int[] weirdo = {0, 1, 1, 2};
   int x = (preX/4)*3;
   x += weirdo[preX%4];
@@ -131,6 +152,29 @@ int getTypeFromXY(int preX, int preY) {
   }
   return result;
 }
+
+int _random_getTypeFromXY(int preX, int preY)
+{
+  // due to weirdness the simulation just dies if any cells are right on the edge
+  if(preX == 0 || preX == WORLD_SIZE-1 || preY == 0 || preY == WORLD_SIZE-1){
+    return 0;
+  }
+  return (int)random(0, 3);
+}
+
+int _Squares_getTypeFromXY(int x, int y)
+{
+  // due to weirdness the simulation just dies if any cells are right on the edge
+  if(x == 0 || x == WORLD_SIZE-1 || y == 0 || y == WORLD_SIZE-1){
+    return 0;
+  }
+  if(x*y % 2 == 1)
+  {
+    return 2;
+  };
+  return 0;
+}
+
 
 boolean wasMouseDown = false;
 double camX = 0;
