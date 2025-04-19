@@ -362,36 +362,51 @@ class Cell{
     return result;
   }
   
-  //public void getValidAdjacentParticlePushOutTiles(){
-  //  int[][] dire = {{0,1},{0,-1},{1,0},{-1,0}};
-  //  while(cells[y+dire[chosen][1]][x+dire[chosen][0]].type == 1){
-   
-  //  }
-  //}
+  public ArrayList<Integer> getValidAdjacentParticlePushOutDires(){
+    int[][] dire = {{0,1},{0,-1},{1,0},{-1,0}};
+    int checkingDire = 0;
+    boolean thereIsAdjacentEmptySpace = false;
+    
+    ArrayList<Integer> chosenValuesPrevChecked = new ArrayList<Integer>();
+    ArrayList<Integer> adjacentTileTypes = new ArrayList<Integer>();
+    
+    for(int i = 0; i < dire.length; i++){
+      // we allow removing particles by just inserting it to another adjacent cell, but only if there are no adjacent empty space tiles.
+      // that should allow waste to eventually get out if there's a large chain of adjacent cells covered by walls that eventually gets to empty space.
+      int currCellType = getCellTypeAt(x+dire[checkingDire][0], y+dire[checkingDire][1], true);
+      if(currCellType != 1){
+        chosenValuesPrevChecked.add(i);
+        adjacentTileTypes.add(currCellType);
+        if(currCellType == 0){
+          thereIsAdjacentEmptySpace = true;
+        }
+      }
+      checkingDire++;
+    }
+    // remove any other cells as valid places to insert waste into if there's adjacent empty space.
+    if(thereIsAdjacentEmptySpace){
+      for(int i = 0; i < chosenValuesPrevChecked.size(); i++){
+        int currCellType = adjacentTileTypes.get(i);
+        if(currCellType == 2){
+          chosenValuesPrevChecked.remove(i);
+          adjacentTileTypes.remove(i);
+        }
+      }
+    }
+    return chosenValuesPrevChecked;
+  }
   
   public void pushOut(Particle waste){
     int[][] dire = {{0,1},{0,-1},{1,0},{-1,0}};
-    /// TODO: implement chosenValuesPreviouslyChecked
-    ArrayList<Integer> chosenValuesPreviouslyChecked = new ArrayList<Integer>();
-    //Arraylist<int> chosenValuesPreviouslyChecked = new Arraylist<int>(); // keep track so we know when to exit the loop but still make it randomly choose a direction.
-    int chosen = (int)random(0, 4);
-    chosenValuesPreviouslyChecked.add(chosen);
-    // System.out.println(cells[0] + " | " + cells[1] + " | x:" + x +  " | y: " + y + " | chosen: " + chosen + " | cells.size(): " + cells.length);
-    // breaks for cells too close to the edge
-    // this function as a whole is a pain because all of its annoying bugs that only crop up when trying to make new map layouts.
-    // =============================================================================================================================================
-    // we allow removing waste by just inserting it to another adjacent cell.
-    // that should allow waste to eventually get out if there's a large chain of adjacent cells covered by walls that eventually gets to empty space.
-    while(cells[y+dire[chosen][1]][x+dire[chosen][0]].type == 1){
-      System.out.println("looping..." + chosen);
-      chosenValuesPreviouslyChecked.add(chosen);
-      chosen = (int)random(0, 4);
-      //if(chosen >= 3)
-      // {
-      //  System.out.println("can't push out particle; there are no adjacent empty space/cell tiles. I am apparently surrounded by walls on all sides. cell position: " + " | x: " + x + " | y: " + y);
-      //  return;
-      // }
+    ArrayList<Integer> validUncheckedDirections = getValidAdjacentParticlePushOutDires();
+    
+    if(validUncheckedDirections.size() == 0){
+      return;
     }
+    
+    int chosenIndex = (int)random(0, validUncheckedDirections.size());
+    int chosen = validUncheckedDirections.get(chosenIndex);
+
     double[] oldCoor = waste.copyCoor();
     for(int dim = 0; dim < 2; dim++){
       if(dire[chosen][dim] == -1){
@@ -452,11 +467,9 @@ class Cell{
       cellCounts[1+tampered_team]--;
       cellCounts[3+tampered_team]++;
     }else{
+      
       cellCounts[0]--;
-      cellCounts[3]++;
-      // when a cell dies without being tampered with, it's considered a death by Team 0.
-      // I know this isn't "fair", but this happens so rarely that I didn't want to bother
-      // coding a whole new section of the graph just for that edge case.
+      cellCounts[9]++;
     }
     sfx[0].play();
     if(cellCounts[0] == 0 && cellCounts[1] == 0 && cellCounts[2] == 0){

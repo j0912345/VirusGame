@@ -3,7 +3,7 @@ import processing.sound.*;
 String[] soundFileNames = {"die.wav", "absorb.wav", "emit.wav", "end.wav", "menu1.wav", "menu2.wav", "menu3.wav", "release.wav", "plug.wav"};
 SoundFile[] sfx;
 // int WORLD_SIZE = 36;
-int WORLD_SIZE = 36;
+int WORLD_SIZE = 37;
 int W_W = 1728;
 int W_H = 972;
 Cell[][] cells = new Cell[WORLD_SIZE][WORLD_SIZE];
@@ -16,19 +16,21 @@ double GENE_TICK_TIME = 40.0;
 double HISTORY_TICK_TIME = 160.0;
 double margin = 4;
 int START_LIVING_COUNT = 0;
-int[] cellCounts = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+int[] cellCounts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 /*
 CATEGORIES FOR THE VIRUS SIM CENSUS
  
  0 - Cell - healthy
  1 - Cell - tampered by Team 0
  2 - Cell - tampered by Team 1
- 3 - Cell - dead by Team 0, or not by virus
+ 3 - Cell - dead by Team 0/the player manually editing a cell (CHECK THIS!)
  4 - Cell - dead by Team 1
  5 - Virus - in blood, Team 0
  6 - Virus - in blood, Team 1
  7 - Virus - in cells, Team 0
  8 - Virus - in cells, Team 1
+ ** new: **
+ 9 - Cell - death not by a virus (ie like presure from waste/starving/etc)
  */
 
 int frame_count = 0;
@@ -63,6 +65,8 @@ color WASTE_COLOR = color(100, 65, 0);
 color HEALTHY_COLOR = color(225, 190, 225);
 color[] TAMPERED_COLOR = {color(205, 225, 70), color(160, 160, 255)};
 color DEAD_COLOR = color(80, 80, 80);
+// DEAD_COLOR_2 is for cell deaths not involving viruses.
+color DEAD_COLOR_2 = color(80, 80, 80);
 color WALL_COLOR = color(170, 100, 170);
 int MAX_CODON_COUNT = 24; // If a cell were to have more codons in its DNA than this number if it were to absorb a virus particle, it won't absorb it.
 int team_produce = 0; // starts as Team 0, but as soon as the first UGO is created, it switches to Team 1.
@@ -91,7 +95,7 @@ void setup() {
   }
   for (int y = 0; y < WORLD_SIZE; y++) {
     for (int x = 0; x < WORLD_SIZE; x++) {
-      int t = getTypeFromXY(x, y);
+      int t = getTypeFromXY(x, y, 2);
       cells[y][x] = new Cell(x, y, t, 0, 1, starterGenome);
       if (t == 2) {
         START_LIVING_COUNT++;
@@ -124,6 +128,10 @@ int getTypeFromXY(int preX, int preY, int type) {
     case 2:
       result = _Squares_getTypeFromXY(preX, preY);
       break;
+    case 3:
+      // seems to get stuck in an infinite loop unfortunately.
+      result = _allCells_getTypeFromXY(preX, preY);
+      break;
   }
   return result;
 }
@@ -155,24 +163,27 @@ int _default_getTypeFromXY(int preX, int preY){
 
 int _random_getTypeFromXY(int preX, int preY)
 {
-  // due to weirdness the simulation just dies if any cells are right on the edge
-  if(preX == 0 || preX == WORLD_SIZE-1 || preY == 0 || preY == WORLD_SIZE-1){
-    return 0;
-  }
+  //if(preX == 0 || preX == WORLD_SIZE-1 || preY == 0 || preY == WORLD_SIZE-1){
+  //  return 0;
+  //}
   return (int)random(0, 3);
 }
 
 int _Squares_getTypeFromXY(int x, int y)
 {
-  // due to weirdness the simulation just dies if any cells are right on the edge
-  if(x == 0 || x == WORLD_SIZE-1 || y == 0 || y == WORLD_SIZE-1){
-    return 0;
-  }
-  if(x*y % 2 == 1)
+  //if(x == 0 || x == WORLD_SIZE-1 || y == 0 || y == WORLD_SIZE-1){
+  //  return 0;
+  //}
+  if((x % 3 != 0) && (y % 3 != 0))
   {
     return 2;
   };
   return 0;
+}
+
+int _allCells_getTypeFromXY(int x, int y)
+{
+  return 2;
 }
 
 
@@ -373,7 +384,7 @@ int loopCodonInfo(int val) {
 }
 // neat packing but also kinda a pain because you have to bring up an ascii table to convert these for hardcoded strings.
 // I might make a format that's easier to process for humans.
-// ALSO NOTE THAT WHILE IT LOOKS LIKE IT STARTS FROM A, IT EFFECTIVELY STARTS FROM _ FOR HARDCODED STRINGS IN THE CODE!
+// ALSO NOTE THAT WHILE IT LOOKS LIKE IT STARTS FROM A (65), IT EFFECTIVELY STARTS FROM _ (95)!
 int codonCharToVal(char c) {
   int val = (int)(c) - (int)('A');
   return val-30;
@@ -601,10 +612,10 @@ void drawSpeedButtons() {
 void drawHistory() {
   recordHistory(frame_count);
   if (team_produce <= 1) {
-    int[] indices = {0, 1, 3};
-    int[] labels = {0, 1, 2, 3};
-    color[] colors = {WALL_COLOR, TAMPERED_COLOR[0], DEAD_COLOR};
-    String[] names = {"H", "T", "D"};
+    int[] indices = {0, 1, 3, 9};
+    int[] labels = {0, 1, 2, 3, 4};
+    color[] colors = {WALL_COLOR, TAMPERED_COLOR[0], DEAD_COLOR, DEAD_COLOR_2};
+    String[] names = {"H", "T", "D", "D (N)"};
     int[] indices2 = {7, 5};
     int[] labels2 = {0, 1, 2};
     color[] colors2 = {darken(TAMPERED_COLOR[0], 0.5), TAMPERED_COLOR[0]};
@@ -637,7 +648,13 @@ void drawGraph(int[] indices, int[] labels, color[] colors, String[] names, floa
   translate(x, y);
   textFont(font, 24);
   float T_W = 6.3; // width per tick
-  float H_C = -H/396; // height per cell
+  // height per cell while accounting for custom maps.
+  // also prevent a division by 0 if the map has 0 cells at the start.
+  int startLivingCountForGraph = START_LIVING_COUNT;
+  if(startLivingCountForGraph == 0){
+    startLivingCountForGraph = 1;
+  }
+  float H_C = -H/startLivingCountForGraph;
   int MAX_WINDOW = 100;
   int window = min(history.size(), MAX_WINDOW);
   int start_i = history.size()-window;
@@ -1014,6 +1031,10 @@ Cell getCellAt(double x, double y, boolean allowLoop) {
 Cell getCellAt(double[] coor, boolean allowLoop) {
   return getCellAt(coor[0], coor[1], allowLoop);
 }
+
+
+
+
 boolean cellTransfer(double x1, double y1, double x2, double y2) {
   int ix1 = (int)Math.floor(x1);
   int iy1 = (int)Math.floor(y1);

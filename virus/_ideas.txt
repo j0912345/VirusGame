@@ -1,8 +1,11 @@
 - extra varible that controls how used energy scales with the amount of food particles in the enviorment and the world size
 - some kind of immune system particle
 - some kind of particle that will give energy to cells that have ran out of energy, giving them a second chance instead of just being a fully sealed fate of death
-- FIX BUG WITH GRAPH ON LARGE WORLD SIZES
 - some kind of cell reproduction system
 - add option to paste in ugo strings instead of having to manually program long ugos every time.
 - add keybind to reset the simuation so the program doesn't need to be restarted. this wouldn't clear the current custom ugo genome.
 - save statistics to some kind of log file. either compress or delete old logs
+- in the create ugo menu add a button to toggle what team the ugo is on. mainly just a nice convenience
+
+BUGS:
+- if you manually edit a cell and it dies then viruses in cells can go negative
