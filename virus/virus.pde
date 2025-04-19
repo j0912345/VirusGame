@@ -95,7 +95,10 @@ void setup() {
   }
   for (int y = 0; y < WORLD_SIZE; y++) {
     for (int x = 0; x < WORLD_SIZE; x++) {
+      
+      // change that 3rd argument to switch map types.
       int t = getTypeFromXY(x, y, 2);
+      
       cells[y][x] = new Cell(x, y, t, 0, 1, starterGenome);
       if (t == 2) {
         START_LIVING_COUNT++;
